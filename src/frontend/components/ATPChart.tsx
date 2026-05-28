@@ -5,6 +5,7 @@ import {
   Tooltip, Legend, ResponsiveContainer,
 } from "recharts";
 import type { SimulationResponse } from "../types/simulation";
+import { toMetaboliteChartData } from "../utils/chartData";
 
 interface Props {
   data: SimulationResponse | null;
@@ -15,30 +16,18 @@ export function ATPChart({ data, loading }: Props) {
   if (!data) {
     return (
       <div className="h-64 flex items-center justify-center text-zinc-600 text-sm">
-        {loading ? "Running simulation…" : "Adjust a slider to start simulation"}
+        {loading ? "Running simulation..." : "Adjust a slider to start simulation"}
       </div>
     );
   }
 
-  const step = Math.ceil(data.t.length / 150);
-  const chartData = data.t
-    .filter((_, i) => i % step === 0)
-    .map((t, i) => {
-      const idx = i * step;
-      return {
-        t: parseFloat(t.toFixed(1)),
-        ATP:     parseFloat((data.atp[idx]     ?? 0).toFixed(3)),
-        NADH:    parseFloat((data.nadh[idx]    ?? 0).toFixed(3)),
-        Glucose: parseFloat((data.glucose[idx] ?? 0).toFixed(3)),
-        AcCoA:   parseFloat((data.ac_coa[idx]  ?? 0).toFixed(3)),
-      };
-    });
+  const chartData = toMetaboliteChartData(data);
 
   return (
     <div className="relative h-64">
       {loading && (
         <div className="absolute inset-0 bg-zinc-900/70 flex items-center justify-center z-10 rounded">
-          <span className="text-blue-400 text-sm animate-pulse">Updating…</span>
+          <span className="text-blue-400 text-sm animate-pulse">Updating...</span>
         </div>
       )}
       <ResponsiveContainer width="100%" height="100%">

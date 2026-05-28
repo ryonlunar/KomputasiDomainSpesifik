@@ -30,3 +30,5 @@ export interface SimulationRequest {
   scenario: "normal" | "no_regulation" | "partial";
   t_end: number;
 }
+
+export type SimulationScenario = SimulationRequest["scenario"];

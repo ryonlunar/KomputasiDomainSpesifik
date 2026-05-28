@@ -1,19 +1,15 @@
 "use client";
 
+import { inhibitionColor } from "../utils/inhibition";
+
 interface Props {
   hkInhibition: number;
   csInhibition: number;
 }
 
-function nodeColor(level: number): string {
-  if (level < 0.3) return "#10b981";
-  if (level < 0.7) return "#f59e0b";
-  return "#ef4444";
-}
-
 export function PathwayDiagram({ hkInhibition, csInhibition }: Props) {
-  const hkColor = nodeColor(hkInhibition);
-  const csColor = nodeColor(csInhibition);
+  const hkColor = inhibitionColor(hkInhibition);
+  const csColor = inhibitionColor(csInhibition);
   const CY = 52;
 
   return (
@@ -87,7 +83,7 @@ export function PathwayDiagram({ hkInhibition, csInhibition }: Props) {
         <text x={58} y={101} fontSize={8} fill="#71717a">Parsial</text>
         <circle cx={100} cy={98} r={4} fill="#ef4444" />
         <text x={108} y={101} fontSize={8} fill="#71717a">Terhambat</text>
-        <text x={170} y={101} fontSize={8} fill="#52525b">╌ feedback inhibition</text>
+        <text x={170} y={101} fontSize={8} fill="#52525b">feedback inhibition</text>
       </svg>
     </div>
   );
