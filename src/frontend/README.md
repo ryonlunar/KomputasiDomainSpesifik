@@ -1,36 +1,88 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SimuCell-Allosteric — Frontend
 
-## Getting Started
+Antarmuka web interaktif berbasis **Next.js 16 + TypeScript + Recharts** untuk eksplorasi parameter simulasi regulasi alosterik enzim. Bagian ini hanya membahas frontend; untuk konteks proyek lengkap lihat [README utama](../../README.md).
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Stack
+
+- **Next.js** 16 (App Router) · **React** 19 · **TypeScript** 5
+- **Tailwind CSS** v4 — styling utility-first
+- **Recharts** 3 — grafik dinamika metabolit
+- **Node.js** ≥ 20
+
+---
+
+## Struktur
+
+```
+frontend/
+├── app/                       # App Router
+│   ├── layout.tsx
+│   ├── page.tsx
+│   └── globals.css
+├── components/                # Komponen UI
+│   ├── SimulationApp.tsx      # Komponen root
+│   ├── SimulationControls.tsx # Slider parameter
+│   ├── ATPChart.tsx           # Grafik metabolit
+│   ├── PathwayDiagram.tsx     # Diagram jalur SVG
+│   ├── EnzymeStatus.tsx       # Panel status inhibisi
+│   ├── ScenarioPanel.tsx
+│   ├── SingleScenarioView.tsx
+│   ├── CompareScenarioView.tsx
+│   ├── SummaryStats.tsx
+│   ├── TabSwitcher.tsx
+│   └── AppHeader.tsx
+├── hooks/
+│   └── useSimulation.ts       # State + fetch + debounce 300 ms
+├── services/
+│   └── api.ts                 # Klien fetch ke backend
+├── config/
+│   └── simulation.ts          # Konstanta parameter UI
+├── types/
+│   └── simulation.ts          # TypeScript types (mirror backend)
+└── utils/
+    ├── chartData.ts
+    └── inhibition.ts
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Menjalankan
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+npm run dev
+```
 
-## Learn More
+Buka [http://localhost:3000](http://localhost:3000).
 
-To learn more about Next.js, take a look at the following resources:
+### Variabel Environment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Nama | Default | Keterangan |
+|------|---------|-----------|
+| `NEXT_PUBLIC_API_BASE_URL` | `http://localhost:8000/api` | Base URL backend FastAPI |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Atur saat build untuk Docker:
 
-## Deploy on Vercel
+```bash
+docker build --build-arg NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api -t simucell-frontend .
+docker run -p 3000:3000 simucell-frontend
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Skrip npm
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Skrip | Deskripsi |
+|-------|-----------|
+| `npm run dev`   | Development server (hot reload) |
+| `npm run build` | Build production |
+| `npm run start` | Jalankan build production |
+| `npm run lint`  | ESLint |
+
+---
+
+## Catatan Pengembangan
+
+- **Debouncing 300 ms** pada perubahan slider — mencegah panggilan `/api/simulate` berlebih.
+- Tipe response backend di-mirror di [`types/simulation.ts`](types/simulation.ts) agar tetap selaras dengan Pydantic schema.
+- Mode pembanding (`CompareScenarioView`) menjalankan tiga request paralel untuk merender skenario *Normal*, *No Regulation*, dan *Partial* berdampingan.
